@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Gastos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="number"], input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .resultado {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Controle de Gastos</h1>
+    
+    <div class="container">
+        <!-- Formulário para cadastro de transações -->
+        <div class="form-group">
+            <label for="descricao">Descrição:</label>
+            <input type="text" id="descricao" placeholder="Exemplo: Supermercado">
+        </div>
+
+        <div class="form-group">
+            <label for="valor">Valor:</label>
+            <input type="number" id="valor" placeholder="Exemplo: 100.50">
+        </div>
+
+        <div class="form-group">
+            <label for="tipo">Tipo:</label>
+            <select id="tipo">
+                <option value="Débito">Débito</option>
+                <option value="Crédito">Crédito</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="data">Data:</label>
+            <input type="date" id="data">
+        </div>
+
+        <button onclick="cadastrarTransacao()">Cadastrar Transação</button>
+        
+        <!-- Exibição de resultados -->
+        <div class="resultado">
+            <h3>Saldo Atual: <span id="saldo">R$ 0.00</span></h3>
+            <h3 id="vermelho"></h3>
+        </div>
+
+        <button onclick="consultarSaldos()">Consultar Saldo</button>
+        <button onclick="verificarVermelho()">Verificar se Está no Vermelho</button>
+        
+        <!-- Tabela para mostrar a lista de transações -->
+        <h2>Transações Cadastradas</h2>
+        <table id="transacoesTabela">
+            <thead>
+                <tr>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                    <th>Tipo</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Transações serão inseridas aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let transacoes = [];
+
+        // Função para cadastrar a transação
+        function cadastrarTransacao() {
+            const descricao = document.getElementById('descricao').value;
+            const valor = parseFloat(document.getElementById('valor').value);
+            const tipo = document.getElementById('tipo').value;
+            const data = document.getElementById('data').value;
+
+            if (!descricao || !valor || !data) {
+                alert('Preencha todos os campos!');
+                return;
+            }
+
+            const transacao = {
+                descricao,
+                valor,
+                tipo,
+                data
+            };
+
+            transacoes.push(transacao);
+            alert('Transação cadastrada com sucesso!');
+            adicionarTransacaoNaTabela(transacao);
+            limparCampos();
+        }
+
+        // Função para adicionar a transação na tabela
+        function adicionarTransacaoNaTabela(transacao) {
+            const tabela = document.getElementById('transacoesTabela').getElementsByTagName('tbody')[0];
+            const novaLinha = tabela.insertRow();
+            novaLinha.innerHTML = `
+                <td>${transacao.descricao}</td>
+                <td>R$ ${transacao.valor.toFixed(2)}</td>
+                <td>${transacao.tipo}</td>
+                <td>${transacao.data}</td>
+            `;
+        }
+
+        // Função para consultar saldo
+        function consultarSaldos() {
+            let saldo = 0;
+            transacoes.forEach(transacao => {
+                if (transacao.tipo === 'Crédito') {
+                    saldo += transacao.valor;
+                } else {
+                    saldo -= transacao.valor;
+                }
+            });
+            document.getElementById('saldo').textContent = `R$ ${saldo.toFixed(2)}`;
+        }
+
+        // Função para verificar se está no vermelho
+        function verificarVermelho() {
+            let saldo = 0;
+            transacoes.forEach(transacao => {
+                if (transacao.tipo === 'Crédito') {
+                    saldo += transacao.valor;
+                } else {
+                    saldo -= transacao.valor;
+                }
+            });
+
+            const mensagem = saldo < 0 ? 'Você está no vermelho!' : 'Você não está no vermelho.';
+            document.getElementById('vermelho').textContent = mensagem;
+        }
+
+        // Função para limpar os campos
+        function limparCampos() {
+            document.getElementById('descricao').value = '';
+            document.getElementById('valor').value = '';
+            document.getElementById('data').value = '';
+        }
+    </script>
+
+</body>
+</html>
